@@ -13,6 +13,37 @@ app.get('/', (req, res) => {
     return res.status(200).send('Hello World');
 })
 
+app.get('/books', async (req, res) => {
+    try{
+        const books = await Book.find();
+        return res.status(200).json({
+            count:books.length,
+            data: books
+        });
+    }catch(error){
+        return res.status(500).send(error.message);
+    }
+});
+
+app.get('/books/:id', async (req,res) =>{
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success: false, message: "Product not found"});
+    }
+
+    try{
+        const books = await Book.findById(id);
+    
+        return res.status(200).json({
+            count:books.length,
+            data: books
+        });
+
+    }catch(error){
+        return res.status(500).send("Server Error");
+    }
+});
+
 app.post('/books', async (req, res) => {
     try{ 
         if(
