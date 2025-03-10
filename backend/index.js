@@ -44,6 +44,49 @@ app.get('/books/:id', async (req,res) =>{
     }
 });
 
+app.put('/books/:id', async (req,res) =>{
+    if(
+        !req.body.title ||
+        !req.body.author ||
+        !req.body.publishYear
+    ){
+        return res.status(400).send('All fields are required');
+    }
+
+    const {id} = req.params;
+    
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success: false, message: "Product not found"});
+    }
+    try{
+        const book = await Book.findByIdAndUpdate(id, req.body, {new: true});
+        return res.status(200).json({
+            success: true,
+            data: book
+        });
+    }catch(error){
+        return res.status(500).send("Server Error");
+    }
+
+});
+
+app.delete('/books/:id', async (req,res) =>{
+    const{id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success: false, message: "Product not found"});
+    }
+    try{
+        await Book.findByIdAndDelete(id);
+        return res.status(200).json({
+            success: true,
+            message: "Book deleted successfully"
+        });
+    }catch(error){
+        return res.status(500).send("Server Error");
+    }
+        
+});
+
 app.post('/books', async (req, res) => {
     try{ 
         if(
